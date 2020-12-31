@@ -1,5 +1,6 @@
 :- use_module(library(clpfd)).
 :- use_module(library(lists)).
+:- consult('display.pl').
 
 checkColSum([Col1, Col2, Col3, Col4], [[_, N1], [_, N2], [_, N3], [_, N4], [_, N5], [_, N6], [_, N7], [_, N8]]) :-
     abs(N1 * N2 - Col1) #= 1,
@@ -9,6 +10,7 @@ checkColSum([Col1, Col2, Col3, Col4], [[_, N1], [_, N2], [_, N3], [_, N4], [_, N
 
 ln2(X) :-
     length(X, 2).
+
 
 solve([LowerLimit, UpperLimit], [[Col1, Col2, Col3, Col4], [Row1, Row2, Row3, Row4]], Res) :-
     Vars = [
@@ -20,6 +22,8 @@ solve([LowerLimit, UpperLimit], [[Col1, Col2, Col3, Col4], [Row1, Row2, Row3, Ro
 
     NumList = [Num1, Num2, Num3, Num4, Num5, Num6, Num7, Num8],
     PosList = [Pos1, Pos2, Pos3, Pos4, Pos5, Pos6, Pos7, Pos8],
+    ColList = [Col1, Col2, Col3, Col4],
+    RowList = [Row1, Row2, Row3, Row4],
 
     domain(NumList, LowerLimit, UpperLimit),
     domain(PosList, 1, 4),
@@ -47,4 +51,5 @@ solve([LowerLimit, UpperLimit], [[Col1, Col2, Col3, Col4], [Row1, Row2, Row3, Ro
     labeling([], PosList),
     labeling([], NumList),
 
-    Res = Vars, !.
+    Res = Vars, !, 
+    display_solution(Res, ColList, RowList).
