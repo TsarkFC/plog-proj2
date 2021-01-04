@@ -2,54 +2,91 @@
 :- use_module(library(lists)).
 :- consult('display.pl').
 
-checkColSum([Col1, Col2, Col3, Col4], [[_, N1], [_, N2], [_, N3], [_, N4], [_, N5], [_, N6], [_, N7], [_, N8]]) :-
-    abs(N1 * N2 - Col1) #= 1,
-    abs(N3 * N4 - Col2) #= 1,
-    abs(N5 * N6 - Col3) #= 1,
-    abs(N7 * N8 - Col4) #= 1.
-
-ln2(X) :-
+% makeLength2(X)
+% Succeeds if X is a list with 2 elements
+makeLength2(X) :-
     length(X, 2).
 
-
-solve([LowerLimit, UpperLimit], [[Col1, Col2, Col3, Col4], [Row1, Row2, Row3, Row4]], Res) :-
-    Vars = [
-        [Pos1, Num1], [Pos2, Num2],
-        [Pos3, Num3], [Pos4, Num4],
-        [Pos5, Num5], [Pos6, Num6],
-        [Pos7, Num7], [Pos8, Num8]
-    ],
-
-    NumList = [Num1, Num2, Num3, Num4, Num5, Num6, Num7, Num8],
-    PosList = [Pos1, Pos2, Pos3, Pos4, Pos5, Pos6, Pos7, Pos8],
-    ColList = [Col1, Col2, Col3, Col4],
-    RowList = [Row1, Row2, Row3, Row4],
+% solve(+LimitList, +RowsAndCols, -Res)
+% Solves the problem, given the variables domain and the columns and rows header values
+% Unifies result with Res
+solve([LowerLimit, UpperLimit], [Columns, Rows], Res) :-
+    generateVars(Columns, Rows, Vars),
+    generateNumPosList(Vars, NumList, PosList),
 
     domain(NumList, LowerLimit, UpperLimit),
-    domain(PosList, 1, 4),
+    length(Columns, ColNum),
+    domain(PosList, 1, ColNum),
     
     all_distinct(NumList),
 
-    global_cardinality(PosList, [1-2, 2-2, 3-2, 4-2]),
+    generateCardinalityList(ColNum, CardinalityList),
+    global_cardinality(PosList, CardinalityList),
 
-    abs(Num1 * Num2 - Row1) #= 1,
-    abs(Num3 * Num4 - Row2) #= 1,
-    abs(Num5 * Num6 - Row3) #= 1,
-    abs(Num7 * Num8 - Row4) #= 1,
+    checkRowSum(Rows, Vars),
 
-    Pos1 #\= Pos2,
-    Pos3 #\= Pos4,
-    Pos5 #\= Pos6,
-    Pos7 #\= Pos8,
+    distinctColumnPosition(PosList),
     
     length(Vars, _Len), 
     length(VarsSorted, _Len),
-    maplist(ln2, VarsSorted),
+    maplist(makeLength2, VarsSorted),
+
     keysorting(Vars, VarsSorted),
-    checkColSum([Col1, Col2, Col3, Col4], VarsSorted),
+
+    checkColSum(Columns, VarsSorted),
 
     labeling([], PosList),
     labeling([], NumList),
 
     Res = Vars, !, 
-    display_solution(Res, ColList, RowList).
+    display_solution(Res, Columns, Rows).
+
+% generateVars(+Columns, +Row, -Vars)
+% Creates the list of control variables, unified in Vars
+generateVars(Columns, Rows, Vars) :-
+    length(Columns, ColumnsLength),
+    length(Rows, RowsLength),
+    ColumnsLength == RowsLength,
+    Size is RowsLength * 2,
+    length(Vars, Size),
+    maplist(makeLength2, Vars).
+
+% checkColSum(+ColList, +VarsSorted)
+% VarsSorted is sorted by column. Makes sure that, for each VarsSorted element pair, which is for sure 
+% in the same column, their values are according to the game's column restrictions.
+checkColSum([], []).
+checkColSum([ CurrentCol | Columns ], [ [_, Value1], [_, Value2] | VarsSortedT ]) :-
+    abs(Value1 * Value2 - CurrentCol) #= 1,
+    checkColSum(Columns, VarsSortedT).
+
+% checkRowSum(+ColList, +Vars)
+% Vars is in an order such that each pair of consecutive elements is in the same row.
+% Makes sure that all of those pairs are according to the problem's row restrictions.
+checkRowSum([], []).
+checkRowSum([ CurrenRow | Rows ], [ [_, Value1], [_, Value2] | VarsT ]) :-
+    abs(Value1 * Value2 - CurrenRow) #= 1,
+    checkRowSum(Rows, VarsT).
+
+% generateCardinalityList(+N, -Output)
+% Generates a list with the column cardinality restrictions (only two elements in each column)
+generateCardinalityList(0, []).
+generateCardinalityList(N, [ H | T ]) :-
+    H = N-2,
+    N1 is N - 1,
+    generateCardinalityList(N1, T), !.
+
+% generateNumPosList(+Vars, -NumList, -PosList)
+% Gets separate lists for number values and column positions from Vars
+generateNumPosList([], [], []).
+generateNumPosList([[Pos, Num] | VarsT], [NumListH | NumListT], [PosListH | PosListT]) :-
+    NumListH = Num,
+    PosListH = Pos,
+    generateNumPosList(VarsT, NumListT, PosListT).
+
+
+% distinctColumnPosition(+PosList)
+% Verifies if there are no two distinct elements in the same row with the same column number
+distinctColumnPosition([]).
+distinctColumnPosition([Pos1, Pos2 | T]) :-
+    Pos1 #\= Pos2,
+    distinctColumnPosition(T).
