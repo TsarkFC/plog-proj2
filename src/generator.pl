@@ -89,7 +89,7 @@ orderedRestriction([First, Second|T]) :-
 
 % getProblemFromVars(+Vars, +BoardSize, -Problem)
 % converts the vars, which is a uni-dimensional list into a Problem, 
-wich is a list with two lists inside: the columns and the rows
+% wich is a list with two lists inside: the columns and the rows
 getProblemFromVars([ VarsH | VarsT ], BoardSize, [ [ ColumnH | ColumnT ], Rows ]) :-
     length(VarsT, VarsLength),
     VarsLength >= BoardSize, !,
