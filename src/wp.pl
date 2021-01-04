@@ -24,9 +24,9 @@ solve([LowerLimit, UpperLimit], [Columns, Rows], Res) :-
     generateCardinalityList(ColNum, CardinalityList),
     global_cardinality(PosList, CardinalityList),
 
-    checkRowSum(Rows, Vars),
-
     distinctColumnPosition(PosList),
+
+    checkRowMult(Rows, Vars),
     
     length(Vars, _Len), 
     length(VarsSorted, _Len),
@@ -34,7 +34,7 @@ solve([LowerLimit, UpperLimit], [Columns, Rows], Res) :-
 
     keysorting(Vars, VarsSorted),
 
-    checkColSum(Columns, VarsSorted),
+    checkColMult(Columns, VarsSorted),
 
     labeling([], PosList),
     labeling([], NumList),
@@ -52,21 +52,21 @@ generateVars(Columns, Rows, Vars) :-
     length(Vars, Size),
     maplist(makeLength2, Vars).
 
-% checkColSum(+ColList, +VarsSorted)
+% checkColMult(+ColList, +VarsSorted)
 % VarsSorted is sorted by column. Makes sure that, for each VarsSorted element pair, which is for sure 
 % in the same column, their values are according to the game's column restrictions.
-checkColSum([], []).
-checkColSum([ CurrentCol | Columns ], [ [_, Value1], [_, Value2] | VarsSortedT ]) :-
+checkColMult([], []).
+checkColMult([ CurrentCol | Columns ], [ [_, Value1], [_, Value2] | VarsSortedT ]) :-
     abs(Value1 * Value2 - CurrentCol) #= 1,
-    checkColSum(Columns, VarsSortedT).
+    checkColMult(Columns, VarsSortedT).
 
-% checkRowSum(+ColList, +Vars)
+% checkRowMult(+RowList, +Vars)
 % Vars is in an order such that each pair of consecutive elements is in the same row.
 % Makes sure that all of those pairs are according to the problem's row restrictions.
-checkRowSum([], []).
-checkRowSum([ CurrenRow | Rows ], [ [_, Value1], [_, Value2] | VarsT ]) :-
+checkRowMult([], []).
+checkRowMult([ CurrenRow | Rows ], [ [_, Value1], [_, Value2] | VarsT ]) :-
     abs(Value1 * Value2 - CurrenRow) #= 1,
-    checkRowSum(Rows, VarsT).
+    checkRowMult(Rows, VarsT).
 
 % generateCardinalityList(+N, -Output)
 % Generates a list with the column cardinality restrictions (only two elements in each column)

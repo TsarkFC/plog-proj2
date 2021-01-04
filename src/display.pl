@@ -56,7 +56,7 @@ display_board_row([Symbol | T], N, RowNumber) :-
     ((RowNumber < 10, N \= -1) -> print(' '); true),
 	print(' \x2502\ '),
 	print(Symbol),
-    print(' '),
+    ((number(Symbol), Symbol >= 10) -> true ; print(' ')),
 	display_board_row(T, -1, RowNumber).
 
 

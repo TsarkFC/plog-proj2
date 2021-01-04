@@ -49,6 +49,8 @@ generate(BoardSize, Problem) :-
 
     getMultiplicationValue(BoardSize, UpperBound, MultiplicationValue),
 
+    write(MultiplicationValue),
+
     domain(Vars, 2, UpperBound),
     all_distinct(Vars),
 
@@ -62,16 +64,16 @@ generate(BoardSize, Problem) :-
     
     ColMult #= MultiplicationValue,
     RowMult #= MultiplicationValue,
-
     labeling([], Vars),
+    write(Vars),
 
     % Add +1 or -1 randomly
     %addOffset(Columns, IntermediateCols),
     %addOffset(Rows, IntermediateRows),
     %addOffsetRandomly(Columns, FinalColumns),
     %addOffsetRandomly(Rows, FinalRows),
-    nl,nl,
-    print('### Trying'), write(Vars), nl,
+    %nl,nl,
+    %print('### Trying'), write(Vars), nl,
     
     finalize(Vars, BoardSize, MaxDomain), read_line(_A), fail.
 
@@ -87,7 +89,7 @@ finalize(ProblemVars, BoardSize, MaxDomain) :-
     getProblemFromVars(ProblemWithOffset, BoardSize, [FinalColumns, FinalRows]),
 
     %nl,
-    write('- '), write([FinalColumns, FinalRows]), nl,
+    %write('- '), write([FinalColumns, FinalRows]), nl,
 
     solve([1, MaxDomain], [FinalColumns, FinalRows], Res), write([FinalColumns, FinalRows]), nl, write(Res).
 
