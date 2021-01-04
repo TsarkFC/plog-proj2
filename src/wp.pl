@@ -1,5 +1,6 @@
 :- use_module(library(clpfd)).
 :- use_module(library(lists)).
+:- consult('generator.pl').
 :- consult('display.pl').
 
 % makeLength2(X)
@@ -38,7 +39,7 @@ solve([LowerLimit, UpperLimit], [Columns, Rows], Res) :-
     labeling([], PosList),
     labeling([], NumList),
 
-    Res = Vars, !, 
+    Res = Vars, !,
     display_solution(Res, Columns, Rows).
 
 % generateVars(+Columns, +Row, -Vars)
