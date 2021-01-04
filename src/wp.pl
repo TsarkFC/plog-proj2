@@ -12,6 +12,7 @@ makeLength2(X) :-
 % Solves the problem, given the variables domain and the columns and rows header values
 % Unifies result with Res
 solve([LowerLimit, UpperLimit], [Columns, Rows], Res) :-
+    
     generateVars(Columns, Rows, Vars),
     generateNumPosList(Vars, NumList, PosList),
 

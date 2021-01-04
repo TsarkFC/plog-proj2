@@ -75,18 +75,26 @@ display_board([H | T], N, ColList, [RowNumber | RowList], RowLength) :-
 	N1 is N+1,
 	display_board(T, N1, ColList, RowList, RowLength).
 
-display_solution(Solution, ColList, RowList) :-
+
+% display_solution(+Solution, +ColList, +RowList)
+% Displays the 'Solution' in grid format.
+display_solution(Solution, ColList, RowList) :- 
+	execution_time, 
 	length(RowList, RowLength),
 	convert_solution_to_board(Solution, Board, RowLength),
 	length(ColList, RowLength),
+	nl,nl,
     display_board(Board, 1, ColList, RowList, RowLength), !.
 
+% make_space(?X)
+% if X is ground, does nothing. If X is not ground, unifies it with ' '
 make_space(X) :-
 	\+ ground(X),
 	X = ' '.
 make_space(_X).
 
-  
+% convert_solution_to_board(+Solution, -Converted, +RowLength, +CurrentRow)
+% Unifies 'Converted' with the 'Solution', in a board format.
 convert_solution_to_board([[Pos, Num] | SolutionT], Converted, RowLength, CurrentRow) :-
 	nth1(Pos, CurrentRow, Num),
 	maplist(make_space, CurrentRow),
@@ -100,3 +108,15 @@ convert_solution_to_board([[Pos, Num] | SolutionT], [Row | ResT], RowLength) :-
 	convert_solution_to_board(SolutionT, ResT, RowLength, Row), !.
 
 
+% execution_time
+% prints the execution time
+execution_time :- 
+    statistics(total_runtime, [_, T]),
+    print('Execution time: '), print(T), print(' ms'), nl, nl.
+
+% reset_execution_time
+% resets the execution time
+reset_execution_time :-
+	statistics(total_runtime, _).
+
+	
